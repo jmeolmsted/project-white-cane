@@ -1,0 +1,7 @@
+{
+  "name": "IOT_Walking_Stick",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

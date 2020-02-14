@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Sensors
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Sensors</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list>
+    <ion-item >
+      <ion-label>In Motion</ion-label>
+      Direction: {{data.drct}}
+      <ion-checkbox slot="end" checked = {{data.motion}} ></ion-checkbox>
+   </ion-item>
+   
+   <ion-item>
+     <ion-label>Distance 1</ion-label>
+     {{data.distance1}} ft
+     <ion-checkbox slot="end" checked = {{data.dist1Warn}} ></ion-checkbox>
+   </ion-item>
+   
+   <ion-item>
+     <ion-label>Distance 2</ion-label>
+     {{data.distance2}} ft
+     <ion-checkbox slot="end" checked = {{data.dist2Warn}} ></ion-checkbox>
+   </ion-item>
+   <ion-item>
+     <ion-label>Distance 3</ion-label>
+     {{data.distance3}} ft
+    <ion-checkbox slot="end" checked = {{data.dist3Warn}} ></ion-checkbox>
+   </ion-item>
+   
+   <ion-item>
+     <ion-label>Buzzer</ion-label>
+     {{data.buzzText}}
+     <ion-checkbox slot="end" checked = {{data.buzzer}} ></ion-checkbox>
+   </ion-item>
+  </ion-list>
+
+ 
+
+  <app-explore-container name="Sensor page"></app-explore-container>
+</ion-content>

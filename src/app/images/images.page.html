@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Images
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Images</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-item>
+    <ion-label>Camera Trigger</ion-label>
+    Heigth Above Ground: {{data.dist}} inches
+    <ion-checkbox slot="end" checked = {{data.camera}} ></ion-checkbox>
+ </ion-item>
+
+ <ion-img src = {{data.image}}></ion-img>
+
+  <app-explore-container name="Images page"></app-explore-container>
+</ion-content>
