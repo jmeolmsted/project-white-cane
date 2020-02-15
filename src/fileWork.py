@@ -7,49 +7,44 @@ except:
 
 import sys
 
-from flask import Flask, render_template, request, redirect, Response
-import random, json
+from flask import Flask, request
+from flask_cors import CORS, cross_origin
+from flask_restful import Resource, Api
+from json import dumps
+from flask_jsonpify import jsonify
 
 onlyfiles = [f for f in listdir('C:/Users/jimmi/Desktop/IOT_Walking_Stick/src/assets/images') if isfile(
     join('C:/Users/jimmi/Desktop/IOT_Walking_Stick/src/assets/images', f))]
 
 count = 0
-out = {'list': []}
+out = {'files': []}
 
 
-def makeEntry(k, v):
-    return {k:v}
+def makeEntry(k,v):
+    return {'id': k, 'name': v}
 
 for x in onlyfiles:
-    key = "key{:d}".format(count)
+    key = count
     value = x
-    out["list"].append(makeEntry(key,value))
-
-print (json.dumps(out))
+    out["files"].append(makeEntry(key,value))
+    count+=1
 
 app = Flask(__name__)
+api = Api(app)
 
-@app.route('/')
-def output():
-	# serve index template
-	return render_template('index.html', name='Joe')
+CORS(app)
 
-@app.route('/receiver', methods = ['POST'])
-def worker():
-	# read json + reply
-	data = request.get_json(force=True)
-	result = ''
+@app.route("/")
+def hello():
+    return jsonify({'text':'Hello World!'})
 
-	for item in data:
-		# loop over every row
-		make = str(item['make'])
-		if(make == 'Porsche'):
-			result += make + ' -- That is a good manufacturer\n'
-		else:
-			result += make + ' -- That is only an average manufacturer\n'
+class Files(Resource):
+    def get(self):
+        return out    
 
-	return result
+
+api.add_resource(Files, '/files') # Route_1
+
 
 if __name__ == '__main__':
-	# run!
-	app.run()
+     app.run(port=5002)
