@@ -1,10 +1,10 @@
+import { IpService } from './../services/ip.service';
 import { ImagesService } from './../services/images.service';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { Observable} from 'rxjs';
-
-
+import { Observable } from 'rxjs';
+import { stringify } from 'querystring';
 
 
 @Component({
@@ -16,7 +16,6 @@ export class ImagesPage {
   title = 'app';
 
   fileData: JSON;
-
   data = {
     dist: 2,
     camera: true,
@@ -29,26 +28,34 @@ export class ImagesPage {
 
   showImage = false;
 
-  constructor(private http: HttpClient, private imageService: ImagesService) {
+  url = 'http://';
+
+  constructor(private http: HttpClient, private imageService: ImagesService, private ipService: IpService) {
   }
 
   // tslint:disable-next-line: use-lifecycle-interface
   ngOnInit() {
-    this.http.get('http://127.0.0.1:5002/files').subscribe(data => {
-      this.fileData = data as JSON;
-      console.log(this.fileData);
+    // tslint:disable-next-line: no-console
+    this.http.get('http://127.0.0.1:5002/ipAddress').subscribe(data => {
+      this.ipService.setAddress(data);
+      this.url = this.url.concat(this.ipService.getAddress(), ':5000/files');
+      this.http.get(this.url).subscribe(files => {
+        this.fileData = data as JSON;
+      });
+      this.server = this.http.get(this.url);
     });
-    this.server = this.http.get('http://127.0.0.1:5002/files');
+
   }
 
   openImage(file) {
     this.imageService.setImage(file);
     if (file === this.selected) {
       this.showImage = false;
+      this.selected = '';
     } else {
       this.showImage = true;
+      this.selected = file;
     }
-    this.selected = file;
     this.data.image = './assets/images/' + this.imageService.getImage();
   }
 

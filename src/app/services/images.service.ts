@@ -9,7 +9,7 @@ export class ImagesService {
 
   constructor() { }
 
-  getImage(){
+  getImage() {
     return this.selected;
   }
 

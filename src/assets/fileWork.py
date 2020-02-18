@@ -1,4 +1,4 @@
-from os import listdir
+from os import listdir, getcwd
 from os.path import isfile, join
 try:
     import simplejson as json
@@ -13,8 +13,13 @@ from flask_restful import Resource, Api
 from json import dumps
 from flask_jsonpify import jsonify
 
-onlyfiles = [f for f in listdir('C:/Users/jimmi/Desktop/IOT_Walking_Stick/src/assets/images') if isfile(
-    join('C:/Users/jimmi/Desktop/IOT_Walking_Stick/src/assets/images', f))]
+import socket
+
+ip = socket.gethostbyname(socket.gethostname())
+directory = getcwd()
+
+onlyfiles = [f for f in listdir(directory+'/images') if isfile(
+    join(directory+'/images', f))]
 
 count = 0
 out = {'files': []}
@@ -47,4 +52,4 @@ api.add_resource(Files, '/files') # Route_1
 
 
 if __name__ == '__main__':
-     app.run(port=5002)
+     app.run(host=ip)
