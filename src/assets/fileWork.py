@@ -1,21 +1,32 @@
-from os import listdir, getcwd, system
+from multiprocessing import *
+import socket
+import signal
+from flask_jsonpify import jsonify
+from json import dumps
+from flask_restful import Resource, Api
+from flask_cors import CORS, cross_origin
+from flask import Flask, request
+import sys
 from os.path import isfile, join
+from os import *
+global STOP
+
 try:
     import simplejson as json
 except:
     import json
 
-import sys
 
-from flask import Flask, request
-from flask_cors import CORS, cross_origin
-from flask_restful import Resource, Api
-from json import dumps
-from flask_jsonpify import jsonify
+def signal_handler(sig, frame):
+    global STOP
+
+    if STOP:
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        kill(getpid(), signal.SIGTERM)
+    STOP = True
 
 
-import socket
-from multiprocessing import Pool
+signal.signal(signal.SIGINT, signal_handler)
 
 ip = socket.gethostbyname(socket.gethostname())
 ip = socket.gethostbyname(socket.gethostname())
@@ -25,20 +36,18 @@ ipApi = Api(ipApp)
 
 CORS(ipApp)
 
+
 @ipApp.route("/")
 def hello():
-    return jsonify({'text':'Hello World!'})
+    return jsonify({'text': 'Hello World!'})
+
 
 class ipAddress(Resource):
     def get(self):
-        return jsonify({'ip': ip})   
+        return jsonify({'ip': ip})
 
 
-ipApi.add_resource(ipAddress, '/ipAddress') # Route_1
-
-
-if __name__ == "ipAddress":
-     ipApp.run(port=5002)
+ipApi.add_resource(ipAddress, '/ipAddress')  # Route_1
 
 directory = getcwd()
 print(directory)
@@ -50,46 +59,56 @@ count = 0
 out = {'files': []}
 
 
-def makeEntry(k,v):
+def makeEntry(k, v):
     return {'id': k, 'name': v}
+
 
 for x in onlyfiles:
     key = count
     value = x
-    out["files"].append(makeEntry(key,value))
-    count+=1
+    out["files"].append(makeEntry(key, value))
+    count += 1
 
 app = Flask(__name__)
 api = Api(app)
 
 CORS(app)
 
+
 @app.route("/")
 def hello():
-    return jsonify({'text':'Hello World!'})
+    return jsonify({'text': 'Hello World!'})
+
 
 class Files(Resource):
     def get(self):
-        return out    
+        return out
 
 
-api.add_resource(Files, '/files') # Route_1
+api.add_resource(Files, '/files')  # Route_1
 
+def runIp():
+    ipApp.run(port=5002)
 
-def runPython():
+def runFile():
     app.run(host=ip)
 
 def runIonic():
     system('ionic serve')
 
+
 def main():
-    pool = Pool(processes=2)
-    python = pool.apply_async(runPython)
-    ionic = pool.apply_async(runIonic)
-
-    pool.close()
-    pool.join()
-
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pool = Pool(processes=3)
+    try:
+        ipSite = pool.apply_async(runIp)
+        fileSite = pool.apply_async(runFile)
+        ionic = pool.apply_async(runIonic)
+        
+        pool.close()
+        pool.join()
+    except:
+        pool.terminate()
 
 if __name__ == '__main__':
     main()
