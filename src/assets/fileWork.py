@@ -16,10 +16,33 @@ from flask_jsonpify import jsonify
 import socket
 
 ip = socket.gethostbyname(socket.gethostname())
-directory = getcwd()
+ip = socket.gethostbyname(socket.gethostname())
 
-onlyfiles = [f for f in listdir(directory+'/images') if isfile(
-    join(directory+'/images', f))]
+ipApp = Flask("ipAddress")
+ipApi = Api(ipApp)
+
+CORS(ipApp)
+
+@ipApp.route("/")
+def hello():
+    return jsonify({'text':'Hello World!'})
+
+class ipAddress(Resource):
+    def get(self):
+        return jsonify({'ip': ip})   
+
+
+ipApi.add_resource(ipAddress, '/ipAddress') # Route_1
+
+
+if __name__ == "ipAddress":
+     ipApp.run(port=5002)
+
+directory = getcwd()
+print(directory)
+
+onlyfiles = [f for f in listdir(directory+'/src/assets/images') if isfile(
+    join(directory+'/src/assets/images', f))]
 
 count = 0
 out = {'files': []}
