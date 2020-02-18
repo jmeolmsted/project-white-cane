@@ -1,4 +1,4 @@
-from os import listdir, getcwd
+from os import listdir, getcwd, system
 from os.path import isfile, join
 try:
     import simplejson as json
@@ -13,7 +13,9 @@ from flask_restful import Resource, Api
 from json import dumps
 from flask_jsonpify import jsonify
 
+
 import socket
+from multiprocessing import Pool
 
 ip = socket.gethostbyname(socket.gethostname())
 ip = socket.gethostbyname(socket.gethostname())
@@ -74,5 +76,20 @@ class Files(Resource):
 api.add_resource(Files, '/files') # Route_1
 
 
+def runPython():
+    app.run(host=ip)
+
+def runIonic():
+    system('ionic serve')
+
+def main():
+    pool = Pool(processes=2)
+    python = pool.apply_async(runPython)
+    ionic = pool.apply_async(runIonic)
+
+    pool.close()
+    pool.join()
+
+
 if __name__ == '__main__':
-     app.run(host=ip)
+    main()
