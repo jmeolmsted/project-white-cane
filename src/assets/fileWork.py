@@ -1,3 +1,4 @@
+global STOP
 from multiprocessing import *
 import socket
 import signal
@@ -5,11 +6,13 @@ from flask_jsonpify import jsonify
 from json import dumps
 from flask_restful import Resource, Api
 from flask_cors import CORS, cross_origin
-from flask import Flask, request
+from flask import Flask, request, url_for, current_app
 import sys
 from os.path import isfile, join
 from os import *
-global STOP
+import urllib.request
+import webbrowser
+
 
 try:
     import simplejson as json
@@ -29,13 +32,11 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 ip = socket.gethostbyname(socket.gethostname())
-ip = socket.gethostbyname(socket.gethostname())
 
 ipApp = Flask("ipAddress")
 ipApi = Api(ipApp)
 
 CORS(ipApp)
-
 
 @ipApp.route("/")
 def hello():
@@ -50,7 +51,6 @@ class ipAddress(Resource):
 ipApi.add_resource(ipAddress, '/ipAddress')  # Route_1
 
 directory = getcwd()
-print(directory)
 
 onlyfiles = [f for f in listdir(directory+'/src/assets/images') if isfile(
     join(directory+'/src/assets/images', f))]
@@ -94,16 +94,20 @@ def runFile():
     app.run(host=ip)
 
 def runIonic():
-    system('ionic serve')
-
+    system('ionic serve --external --no-open')
+    
+def openWeb():
+    url = 'http://' + ip + ':8100'
+    webbrowser.open(url)
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
-    pool = Pool(processes=3)
+    pool = Pool(processes=2)
     try:
         ipSite = pool.apply_async(runIp)
         fileSite = pool.apply_async(runFile)
-        ionic = pool.apply_async(runIonic)
+        #ionic = pool.apply_async(runIonic)
+        #browser = pool.apply_async(openWeb)
         
         pool.close()
         pool.join()
