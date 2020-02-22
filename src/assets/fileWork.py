@@ -9,7 +9,7 @@ from flask_cors import CORS, cross_origin
 from flask import Flask, request, url_for, current_app
 import sys
 from os.path import isfile, join
-from os import *
+from os import getpid, getcwd, listdir, kill, system
 import urllib.request
 import webbrowser
 
@@ -31,7 +31,17 @@ def signal_handler(sig, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-ip = socket.gethostbyname(socket.gethostname())
+ip = ''
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8",80))
+ip = s.getsockname()[0]
+s.close()
+
+# data = {'ip': ip}
+
+# f = open("./src/assets/ip.json", "w")
+# f.write(json.dumps(data))
+# f.close()
 
 ipApp = Flask("ipAddress")
 ipApi = Api(ipApp)

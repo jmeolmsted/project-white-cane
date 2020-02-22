@@ -42,7 +42,7 @@ export class ImagesPage {
     // tslint:disable-next-line: no-console
     this.ipAddress = window.location.hostname;
     console.log(this.ipAddress);
-    this.url = this.url.concat(this.ipAddress, ':5000/files');
+    this.url = this.url.concat('10.16.22.51:5000/files');
     this.http.get(this.url).subscribe(files => {
       this.fileData = files as JSON;
     });
