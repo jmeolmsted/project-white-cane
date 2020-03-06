@@ -118,7 +118,7 @@ class Data(Resource):
         valUSRFT = converter(ultrasonicRead(usft))
         valUSRL = converter(ultrasonicRead(usl))
         valUSRR = converter(ultrasonicRead(usr))
-        valTouch = converter(digitalRead(touch))
+        valTouch = digitalRead(touch)
         data["entries"] = makeData(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR,valTouch,valHeart)
         return jsonify(data)
 
