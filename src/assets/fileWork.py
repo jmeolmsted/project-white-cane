@@ -13,7 +13,7 @@ from os import getpid, getcwd, listdir, kill, system
 import webbrowser
 import time
 from grovepi import *
-from picamera import PiCamera
+# from picamera import PiCamera
 
 
 try:
@@ -22,7 +22,7 @@ except:
     import json
 
 
-camera = PiCamera()
+# camera = PiCamera()
 
 # Pin Numbers
 vibrator = 3
@@ -114,11 +114,13 @@ class Files(Resource):
 
 class Data(Resource):
     def get(self):
-        valUSRFB = converter(ultrasonicRead(usfb))
-        valUSRFT = converter(ultrasonicRead(usft))
-        valUSRL = converter(ultrasonicRead(usl))
-        valUSRR = converter(ultrasonicRead(usr))
+        valUSRFB = ultrasonicRead(usfb)
+        valUSRFT = ultrasonicRead(usft)
+        valUSRL = ultrasonicRead(usl)
+        valUSRR = ultrasonicRead(usr)
+        valIR = 2
         valTouch = digitalRead(touch)
+        valHeart = 60
         data["entries"] = makeData(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR,valTouch,valHeart)
         return jsonify(data)
 
