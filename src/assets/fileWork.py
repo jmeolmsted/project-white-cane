@@ -11,6 +11,9 @@ from flask import Flask, request, url_for, current_app
 from os.path import isfile, join
 from os import getpid, getcwd, listdir, kill, system
 import webbrowser
+import time
+from grovepi import *
+from picamera import PiCamera
 
 
 try:
@@ -18,6 +21,19 @@ try:
 except:
     import json
 
+
+camera = PiCamera()
+
+# Pin Numbers
+vibrator = 3
+touch = 2
+usft = 6
+usfb = 5
+usr = 8
+usl = 7
+
+pinMode(vibrator, "OUTPUT")
+pinMode(touch, "INPUT")
 
 def signal_handler(sig, frame):
     global STOP
@@ -98,11 +114,20 @@ class Files(Resource):
 
 class Data(Resource):
     def get(self):
-        data["entries"] = makeData(20,22,15,10,1,True,60)
+        valUSRFB = converter(ultrasonicRead(usfb))
+        valUSRFT = converter(ultrasonicRead(usft))
+        valUSRL = converter(ultrasonicRead(usl))
+        valUSRR = converter(ultrasonicRead(usr))
+        valTouch = converter(digitalRead(touch))
+        data["entries"] = makeData(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR,valTouch,valHeart)
         return jsonify(data)
 
 api.add_resource(Files, '/files')  # Route_1
 api.add_resource(Data, '/data')
+
+def converter(cm):
+    feet = (cm * 0.393701)/12
+    return feet
 
 def runIp():
     ipApp.run(port=5002)
