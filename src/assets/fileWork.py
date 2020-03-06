@@ -1,3 +1,4 @@
+
 global STOP
 from multiprocessing import *
 import socket
@@ -7,11 +8,10 @@ from json import dumps
 from flask_restful import Resource, Api
 from flask_cors import CORS, cross_origin
 from flask import Flask, request, url_for, current_app
-import sys
 from os.path import isfile, join
 from os import getpid, getcwd, listdir, kill, system
 import webbrowser
-import random
+
 
 try:
     import simplejson as json
@@ -46,12 +46,6 @@ ipApp = Flask("ipAddress")
 ipApi = Api(ipApp)
 
 CORS(ipApp)
-
-
-
-@ipApp.route("/")
-def hello():
-    return jsonify({'text': 'Hello World!'})
 
 
 class ipAddress(Resource):

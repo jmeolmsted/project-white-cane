@@ -23,7 +23,7 @@ export class SensorsPage {
   };
 
   value: any;
-  url = 'http://10.16.12.190:5000/data';
+  url = 'http://10.16.26.188:5000/data';
   server: Observable<any>;
 
 
