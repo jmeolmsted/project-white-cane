@@ -14,21 +14,26 @@
   </ion-header>
 
   <ion-item>
-    <ion-label>Camera Trigger</ion-label>
-    Height Above Ground: {{data.dist}} inches
-    <ion-checkbox slot="end" checked = {{data.camera}} ></ion-checkbox>
+    <ion-label>{{data.usfText}}</ion-label>
+    <div *ngIf= data.usfCamera>Distance from Obstacle: {{data.usf}} ft</div>
  </ion-item>
+
+ <ion-item>
+  <ion-label>{{data.irText}}</ion-label>
+  <div *ngIf= data.irCamera>Height Above Ground: {{data.ir}} ft</div>
+</ion-item>
 
  <ion-list>
   <ion-item *ngFor= "let file of (server | async)?.files" (click)="openImage(file.name)" ><ion-label>
     {{file.name}}
   </ion-label>
-  <ion-checkbox slot="end"  ></ion-checkbox>
+  <ion-checkbox slot="end" checked= {{selected.includes(file.name)}}></ion-checkbox>
+
 </ion-item> 
 </ion-list>
 
- <div *ngIf= showImage >
-   <ion-img src={{data.image}}></ion-img>
+ <div *ngIf= showImage>
+   <p align="center"><ion-img style="width: 500px; height: 500px;" src={{data.image}}></ion-img></p>
  </div>
 
   <app-explore-container name="Images page"></app-explore-container>

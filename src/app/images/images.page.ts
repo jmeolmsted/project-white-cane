@@ -1,11 +1,11 @@
+import { SensorsService } from './../services/sensors.service';
 import { IpAddressService } from './../services/ip-address.service';
 import { IpService } from './../services/ip.service';
 import { ImagesService } from './../services/images.service';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { NavController } from '@ionic/angular';
 import { Observable } from 'rxjs';
-import { stringify } from 'querystring';
+
 
 
 
@@ -19,11 +19,17 @@ export class ImagesPage {
 
   fileData: JSON;
   data = {
-    dist: 2,
-    camera: true,
+    usfText: '',
+    irText: '',
+    ir: 1,
+    usf: 20,
+    usfCamera: false,
+    irCamera: false,
+    camera: false,
     image: './assets/images/favicon.png'
   };
 
+  value: any;
   server: Observable<any>;
 
   selected = '';
@@ -31,44 +37,75 @@ export class ImagesPage {
   showImage = false;
   ipAddress: string;
   endpoint: string;
-  url = 'http://';
+  fileURL = 'http://10.16.12.190:5000/files';
+  dataURL = 'http://10.16.12.190:5000/data';
   results = {};
+  check: any;
 
-  constructor(private http: HttpClient, private imageService: ImagesService, private ipService: IpService, private ip: IpAddressService) {
+  constructor(private http: HttpClient, private imageService: ImagesService, private ipService: IpService, private ip: IpAddressService,
+              private sensor: SensorsService) {
   }
 
   // tslint:disable-next-line: use-lifecycle-interface
   ngOnInit() {
     // tslint:disable-next-line: no-console
     this.ipAddress = window.location.hostname;
-    console.log(this.ipAddress);
-    this.url = this.url.concat('10.16.22.51:5000/files');
-    this.http.get(this.url).subscribe(files => {
+    this.getStatus();
+    this.http.get(this.fileURL).subscribe(files => {
       this.fileData = files as JSON;
     });
+    this.server = this.http.get(this.fileURL);
 
-    // this.http.get('http://127.0.0.1:5002/ipAddress').subscribe(data => {
-    //   this.ipService.setAddress(data);
-    //   this.url = this.url.concat(this.ipAddress, ':5000/files');
-    //   this.http.get(this.url).subscribe(files => {
-    //     this.fileData = files as JSON;
-    //   });
-    // this.ip.getIPAddress().subscribe((res: any) => {
-    //   this.ipAddress = res.ip;
-    //   this.url = this.url.concat(this.ipAddress, ':5000/files');
-    //   console.log(this.url);
-    //   this.http.get(this.url).subscribe(files => {
-    //     this.fileData = files as JSON;
-    //   });
-    this.server = this.http.get(this.url);
+    setInterval(() => {
+      this.getStatus(); // Now the "this" still references the component
+    }, 1000);
 
   }
 
   getIP() {
     this.ip.getIPAddress().subscribe((res: any) => {
       this.ipAddress = res.ip;
-      console.log(this.ipAddress);
     });
+  }
+
+  getStatus() {
+    this.http.get(this.dataURL).subscribe(data => {
+      this.sensor.setData(data);
+      this.value = this.sensor.getData();
+      if ( this.value.usrft <= 3 && this.value.usrfb <= 3) {
+        this.data.usf = (this.value.ursft + this.value.usrfb) / 2;
+        this.data.usfCamera = true;
+        this.data.usfText = 'Obstacle Detected By Top and Bottom USR!';
+      } else if ( this.value.usrft <= 3 && this.value.usrfb > 3) {
+        this.data.usf = this.value.usrft;
+        this.data.usfCamera = true;
+        this.data.usfText = 'Obstacle Detected By Top USR!';
+      } else if ( this.value.usrft > 3 && this.value.usrfb <= 3) {
+        this.data.usf = this.value.usrfb;
+        this.data.usfCamera = true;
+        this.data.usfText = 'Obstacle Detected By Bottom USR!';
+      } else {
+        this.data.usfCamera = false;
+        this.data.usfText = 'No Obstacle Detected.';
+      }
+      if (this.value.ir > 1) {
+        this.data.ir = this.value.ir;
+        this.data.irCamera = true;
+        this.data.irText = 'Stair or Slope Detected by IR Sensor!';
+      } else {
+        this.data.irCamera = false;
+        this.data.irText = 'No Stair or Slope Detected.';
+      }
+      this.data.camera = this.data.irCamera || this.data.usfCamera;
+    });
+    if (this.data.camera) {
+      this.http.get(this.fileURL).subscribe(files => {
+        this.fileData = files as JSON;
+        // tslint:disable-next-line: no-string-literal
+        this.openImage(this.fileData['files'][this.fileData['files'].length - 1].name);
+      });
+      this.server = this.http.get(this.fileURL);
+    }
   }
 
   openImage(file) {

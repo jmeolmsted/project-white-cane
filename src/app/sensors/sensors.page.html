@@ -15,26 +15,25 @@
 
   <ion-list>
     <ion-item >
-      <ion-label>In Motion</ion-label>
-      Direction: {{data.drct}}
-      <ion-checkbox slot="end" checked = {{data.motion}} ></ion-checkbox>
+      <ion-label>In Use</ion-label>
+      <ion-checkbox slot="end" checked = {{data.touch}} ></ion-checkbox>
    </ion-item>
    
    <ion-item>
-     <ion-label>Distance 1</ion-label>
-     {{data.distance1}} ft
-     <ion-checkbox slot="end" checked = {{data.dist1Warn}} ></ion-checkbox>
+     <ion-label>Front Distance</ion-label>
+     {{data.usrf}} ft
+     <ion-checkbox slot="end" checked = {{data.frontWarn}} ></ion-checkbox>
    </ion-item>
    
    <ion-item>
-     <ion-label>Distance 2</ion-label>
-     {{data.distance2}} ft
-     <ion-checkbox slot="end" checked = {{data.dist2Warn}} ></ion-checkbox>
+     <ion-label>Left Distance</ion-label>
+     {{data.usrl}} ft
+     <ion-checkbox slot="end" checked = {{data.leftWarn}} ></ion-checkbox>
    </ion-item>
    <ion-item>
-     <ion-label>Distance 3</ion-label>
-     {{data.distance3}} ft
-    <ion-checkbox slot="end" checked = {{data.dist3Warn}} ></ion-checkbox>
+     <ion-label>Right Distance</ion-label>
+     {{data.usrr}} ft
+    <ion-checkbox slot="end" checked = {{data.rightWarn}} ></ion-checkbox>
    </ion-item>
    
    <ion-item>

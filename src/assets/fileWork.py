@@ -12,7 +12,7 @@ from os.path import isfile, join
 from os import getpid, getcwd, listdir, kill, system
 import urllib.request
 import webbrowser
-
+import random
 
 try:
     import simplejson as json
@@ -48,6 +48,8 @@ ipApi = Api(ipApp)
 
 CORS(ipApp)
 
+
+
 @ipApp.route("/")
 def hello():
     return jsonify({'text': 'Hello World!'})
@@ -60,24 +62,31 @@ class ipAddress(Resource):
 
 ipApi.add_resource(ipAddress, '/ipAddress')  # Route_1
 
-directory = getcwd()
-
-onlyfiles = [f for f in listdir(directory+'/src/assets/images') if isfile(
-    join(directory+'/src/assets/images', f))]
-
-count = 0
-out = {'files': []}
-
+data = {'entries':  []}
 
 def makeEntry(k, v):
     return {'id': k, 'name': v}
 
+def makeData(usrfb,usrft,usrl,usrr,ir,touch,heart):
+    value = {'entry':[{'USRFB': usrfb}, {'USRFT': usrft}, {'USRL': usrl}, {'USRR': usrr}, {'IR': ir}, {'touch': touch}, {'heart': heart}]}
+    return value
 
-for x in onlyfiles:
-    key = count
-    value = x
-    out["files"].append(makeEntry(key, value))
-    count += 1
+
+def getImages():
+    directory = getcwd()
+
+    onlyfiles = [f for f in listdir(directory+'/src/assets/images') if isfile(
+        join(directory+'/src/assets/images', f))]
+
+    count = 0
+    out = {'files': []}
+
+    for x in onlyfiles:
+        key = count
+        value = x
+        out["files"].append(makeEntry(key, value))
+        count += 1
+    return out
 
 app = Flask(__name__)
 api = Api(app)
@@ -92,10 +101,15 @@ def hello():
 
 class Files(Resource):
     def get(self):
-        return out
+        return getImages()
 
+class Data(Resource):
+    def get(self):
+        data["entries"] = makeData(20,22,15,10,1,True,60)
+        return jsonify(data)
 
 api.add_resource(Files, '/files')  # Route_1
+api.add_resource(Data, '/data')
 
 def runIp():
     ipApp.run(port=5002)

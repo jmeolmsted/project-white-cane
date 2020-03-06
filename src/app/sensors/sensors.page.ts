@@ -1,4 +1,8 @@
+import { SensorsService } from './../services/sensors.service';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+
 
 @Component({
   selector: 'app-sensors',
@@ -6,18 +10,56 @@ import { Component } from '@angular/core';
   styleUrls: ['sensors.page.scss']
 })
 export class SensorsPage {
-  data = { distance1: 200,
-    distance2: 200,
-    distance3: 200,
-    drct: 'North',
-    motion: true,
+  data = { usrf: 200,
+    usrl: 200,
+    usrr: 200,
+    touch: true,
+    heart: 60,
     buzzer: false,
     buzzText : 'Off',
-    dist1Warn: false,
-    dist2Warn: false,
-    dist3Warn: false
+    frontWarn: false,
+    rightWarn: false,
+    leftWarn: false
   };
 
-  constructor() {}
+  value: any;
+  url = 'http://10.16.12.190:5000/data';
+  server: Observable<any>;
 
+
+  constructor(private http: HttpClient, private sensors: SensorsService) {}
+
+  // tslint:disable-next-line: use-lifecycle-interface
+  ngOnInit() {
+    // tslint:disable-next-line: no-console
+    this.http.get(this.url).subscribe(data => {
+      this.sensors.setData(data);
+      this.value = this.sensors.getData();
+      this.updateData();
+    });
+
+    this.server = this.http.get(this.url);
+    setInterval(() => {
+      this.getData(); // Now the "this" still references the component
+      this.updateData();
+    }, 1000);
+  }
+
+  getData() {
+    this.http.get(this.url).subscribe(data => {
+      this.sensors.setData(data);
+      this.value = this.sensors.getData();
+      this.updateData();
+    });
+
+    this.server = this.http.get(this.url);
+  }
+
+  updateData() {
+    this.data.usrf = (this.value.usrfb + this.value.usrft) / 2;
+    this.data.usrl = this.value.usrl;
+    this.data.usrr = this.value.usrr;
+    this.data.touch = this.value.touch;
+    this.data.heart = this.value.heart;
+  }
 }
