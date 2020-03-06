@@ -10,7 +10,6 @@ from flask import Flask, request, url_for, current_app
 import sys
 from os.path import isfile, join
 from os import getpid, getcwd, listdir, kill, system
-import urllib.request
 import webbrowser
 import random
 
