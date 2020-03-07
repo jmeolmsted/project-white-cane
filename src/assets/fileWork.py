@@ -1,18 +1,20 @@
-
 global STOP
-from multiprocessing import *
-import socket
 import signal
-from flask_jsonpify import jsonify
-from json import dumps
-from flask_restful import Resource, Api
-from flask_cors import CORS, cross_origin
-from flask import Flask, request, url_for, current_app
-from os.path import isfile, join
-from os import getpid, getcwd, listdir, kill, system
-import webbrowser
+import socket
 import time
+import webbrowser
+from json import dumps
+from multiprocessing import *
+from os import getcwd, getpid, kill, listdir, system
+from os.path import isfile, join
+
+from flask import Flask, current_app, request, url_for
+
+from flask_cors import CORS, cross_origin
+from flask_jsonpify import jsonify
+from flask_restful import Api, Resource
 from grovepi import *
+
 # from picamera import PiCamera
 
 
@@ -35,16 +37,16 @@ usl = 7
 pinMode(vibrator, "OUTPUT")
 pinMode(touch, "INPUT")
 
-def signal_handler(sig, frame):
-    global STOP
+# def signal_handler(sig, frame):
+#     global STOP
 
-    if STOP:
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
-        kill(getpid(), signal.SIGTERM)
-    STOP = True
+#     if STOP:
+#         signal.signal(signal.SIGINT, signal.SIG_IGN)
+#         kill(getpid(), signal.SIGTERM)
+#     STOP = True
 
 
-signal.signal(signal.SIGINT, signal_handler)
+# signal.signal(signal.SIGINT, signal_handler)
 
 ip = ''
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -52,24 +54,18 @@ s.connect(("8.8.8.8",80))
 ip = s.getsockname()[0]
 s.close()
 
-# data = {'ip': ip}
+# ipApp = Flask("ipAddress")
+# ipApi = Api(ipApp)
 
-# f = open("./src/assets/ip.json", "w")
-# f.write(json.dumps(data))
-# f.close()
-
-ipApp = Flask("ipAddress")
-ipApi = Api(ipApp)
-
-CORS(ipApp)
+# CORS(ipApp)
 
 
-class ipAddress(Resource):
-    def get(self):
-        return jsonify({'ip': ip})
+# class ipAddress(Resource):
+#     def get(self):
+#         return jsonify({'ip': ip})
 
 
-ipApi.add_resource(ipAddress, '/ipAddress')  # Route_1
+# ipApi.add_resource(ipAddress, '/ipAddress')  # Route_1
 
 data = {'entries':  []}
 
@@ -80,6 +76,16 @@ def makeData(usrfb,usrft,usrl,usrr,ir,touch,heart):
     value = {'entry':[{'USRFB': usrfb}, {'USRFT': usrft}, {'USRL': usrl}, {'USRR': usrr}, {'IR': ir}, {'touch': touch}, {'heart': heart}]}
     return value
 
+def getData():
+    valUSRFB = converter(ultrasonicRead(usfb))
+    valUSRFT = converter(ultrasonicRead(usft))
+    valUSRL = converter(ultrasonicRead(usl))
+    valUSRR = converter(ultrasonicRead(usr))
+    valIR = 1
+    valTouch = True if digitalRead(touch) == 1 else False
+    valHeart = 60
+    data["entries"] = makeData(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR,valTouch,valHeart)
+    return data
 
 def getImages():
     directory = getcwd()
@@ -114,15 +120,7 @@ class Files(Resource):
 
 class Data(Resource):
     def get(self):
-        valUSRFB = ultrasonicRead(usfb)
-        valUSRFT = ultrasonicRead(usft)
-        valUSRL = ultrasonicRead(usl)
-        valUSRR = ultrasonicRead(usr)
-        valIR = 2
-        valTouch = digitalRead(touch)
-        valHeart = 60
-        data["entries"] = makeData(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR,valTouch,valHeart)
-        return jsonify(data)
+        return getData()
 
 api.add_resource(Files, '/files')  # Route_1
 api.add_resource(Data, '/data')
@@ -159,4 +157,5 @@ def main():
         pool.terminate()
 
 if __name__ == '__main__':
-    main()
+    #  main()
+    runFile()
