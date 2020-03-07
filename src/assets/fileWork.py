@@ -14,6 +14,7 @@ from flask_cors import CORS, cross_origin
 from flask_jsonpify import jsonify
 from flask_restful import Api, Resource
 from grovepi import *
+from math import round
 
 # from picamera import PiCamera
 
@@ -77,10 +78,10 @@ def makeData(usrfb,usrft,usrl,usrr,ir,touch,heart):
     return value
 
 def getData():
-    valUSRFB = converter(ultrasonicRead(usfb))
-    valUSRFT = converter(ultrasonicRead(usft))
-    valUSRL = converter(ultrasonicRead(usl))
-    valUSRR = converter(ultrasonicRead(usr))
+    valUSRFB = round(converter(ultrasonicRead(usfb)),1)
+    valUSRFT = round(converter(ultrasonicRead(usft)),1)
+    valUSRL = round(converter(ultrasonicRead(usl)),1)
+    valUSRR = round(converter(ultrasonicRead(usr)),1)
     valIR = 1
     valTouch = True if digitalRead(touch) == 1 else False
     valHeart = 60
