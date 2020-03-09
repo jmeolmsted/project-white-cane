@@ -23,7 +23,7 @@ export class SensorsPage {
   };
 
   value: any;
-  url = 'http://10.16.26.188:5000/data';
+  url = 'http://pitunnel2.com:42877/data';
   server: Observable<any>;
 
 

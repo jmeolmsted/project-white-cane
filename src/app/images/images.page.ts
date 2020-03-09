@@ -37,8 +37,8 @@ export class ImagesPage {
   showImage = false;
   ipAddress: string;
   endpoint: string;
-  fileURL = 'http://10.16.26.188:5000/files';
-  dataURL = 'http://10.16.26.188:5000/data';
+  fileURL = 'http://pitunnel2.com:42877/files';
+  dataURL = 'http://pitunnel2.com:42877/data';
   results = {};
   check: any;
 

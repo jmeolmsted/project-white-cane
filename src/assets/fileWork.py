@@ -14,7 +14,6 @@ from flask_cors import CORS, cross_origin
 from flask_jsonpify import jsonify
 from flask_restful import Api, Resource
 from grovepi import *
-from math import round
 
 # from picamera import PiCamera
 
