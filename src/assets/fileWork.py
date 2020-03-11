@@ -64,7 +64,9 @@ def getData():
             digitalWrite(vibrator,1)
         else:
             digitalWrite(vibrator, 0)
-        data["entries"] = makeData(
+    else:
+        digitalWrite(vibrator, 0)
+    data["entries"] = makeData(
             valUSRFB, valUSRFT, valUSRL, valUSRR, valIR, valTouch, valHeart)
     return data
     
