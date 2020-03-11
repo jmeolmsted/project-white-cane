@@ -55,11 +55,11 @@ export class ImagesPage {
       this.fileData = files as JSON;
     });
     this.server = this.http.get(this.fileURL);
-    console.log(this.server)
+    console.log(this.server);
 
     setInterval(() => {
       this.getStatus(); // Now the "this" still references the component
-    }, 1000);
+    }, 250);
 
   }
 
@@ -73,15 +73,15 @@ export class ImagesPage {
     this.http.get(this.dataURL).subscribe(data => {
       this.sensor.setData(data);
       this.value = this.sensor.getData();
-      if ( this.value.usrft <= 3 && this.value.usrfb <= 3) {
+      if ( this.value.usrft <= 4 && this.value.usrfb <= 2) {
         this.data.usf = (this.value.ursft + this.value.usrfb) / 2;
         this.data.usfCamera = true;
         this.data.usfText = 'Obstacle Detected By Top and Bottom USR!';
-      } else if ( this.value.usrft <= 3 && this.value.usrfb > 3) {
+      } else if ( this.value.usrft <= 4 && this.value.usrfb > 2) {
         this.data.usf = this.value.usrft;
         this.data.usfCamera = true;
         this.data.usfText = 'Obstacle Detected By Top USR!';
-      } else if ( this.value.usrft > 3 && this.value.usrfb <= 3) {
+      } else if ( this.value.usrft > 4 && this.value.usrfb <= 2) {
         this.data.usf = this.value.usrfb;
         this.data.usfCamera = true;
         this.data.usfText = 'Obstacle Detected By Bottom USR!';
@@ -89,7 +89,7 @@ export class ImagesPage {
         this.data.usfCamera = false;
         this.data.usfText = 'No Obstacle Detected.';
       }
-      if (this.value.ir > 1) {
+      if (this.value.ir > 2) {
         this.data.ir = this.value.ir;
         this.data.irCamera = true;
         this.data.irText = 'Stair or Slope Detected by IR Sensor!';
