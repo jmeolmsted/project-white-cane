@@ -9,6 +9,7 @@ from os import getcwd, getpid, kill, listdir, system
 from multiprocessing import *
 from json import dumps
 from pulsesensor import Pulsesensor
+from datetime import datetime
 import webbrowser
 import time
 import socket
@@ -22,9 +23,6 @@ try:
 except:
     import json
 
-
-camera = PiCamera()
-
 # Pin Numbers
 vibrator = 3
 touch = 2
@@ -36,38 +34,11 @@ usl = 7
 pinMode(vibrator, "OUTPUT")
 pinMode(touch, "INPUT")
 
-# def signal_handler(sig, frame):
-#     global STOP
-
-#     if STOP:
-#         signal.signal(signal.SIGINT, signal.SIG_IGN)
-#         kill(getpid(), signal.SIGTERM)
-#     STOP = True
-
-
-# signal.signal(signal.SIGINT, signal_handler)
-
 ip = ''
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
 ip = s.getsockname()[0]
 s.close()
-
-# ipApp = Flask("ipAddress")
-# ipApi = Api(ipApp)
-
-# CORS(ipApp)
-
-
-# class ipAddress(Resource):
-#     def get(self):
-#         return jsonify({'ip': ip})
-
-
-# ipApi.add_resource(ipAddress, '/ipAddress')  # Route_1
-
-data = {'entries':  []}
-
 
 def makeEntry(k, v):
     return {'id': k, 'name': v}
@@ -80,26 +51,33 @@ def makeData(usrfb, usrft, usrl, usrr, ir, touch, heart):
 
 
 def getData():
+    data = {'entries':  []}
     valUSRFB = round(converter(ultrasonicRead(usfb)), 1)
     valUSRFT = round(converter(ultrasonicRead(usft)), 1)
     valUSRL = round(converter(ultrasonicRead(usl)), 1)
     valUSRR = round(converter(ultrasonicRead(usr)), 1)
     valIR = round(irConverter(irDist()), 1)
     valTouch = True if digitalRead(touch) == 1 else False
-    valHeart = getHeart()
-    vibrationStatus(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR)
+    valHeart = 60
+    if(valUSRFB <= 3 or valUSRFT <= 3 or valUSRL <= 3 or valUSRR <= 3 or valIR > 1):
+        digitalWrite(vibrator,1)
+        print("On")
+    else:
+        digitalWrite(vibrator, 0)
+        print("off")
     data["entries"] = makeData(
         valUSRFB, valUSRFT, valUSRL, valUSRR, valIR, valTouch, valHeart)
     return data
+    
+    
 
-def vibrationStatus(fb,ft,l,r,ir) :
-    if( fb <= 3 or ft <= 3 or l <= 3 or r <= 3 or ir > 1):
-        digitalWrite(vibrator,1)
-    else:
-        digitalWrite(vibrator, 0)
 
 def getImages():
     directory = getcwd()
+    valUSRFB = round(converter(ultrasonicRead(usfb)), 1)
+    valUSRFT = round(converter(ultrasonicRead(usft)), 1)
+    valIR = round(irConverter(irDist()), 1)
+    takeImage(valUSRFB, valUSRFT, valIR)
 
     onlyfiles = [f for f in listdir(directory+'/src/assets/images') if isfile(
         join(directory+'/src/assets/images', f))]
@@ -140,14 +118,35 @@ api.add_resource(Files, '/files')  # Route_1
 api.add_resource(Data, '/data')
 
 
+def takeImage(fb, ft, ir):
+    if(fb <= 3 or ft <= 3 or ir > 1):
+        camera = PiCamera()
+
+        camera.start_preview()
+        print("Preview Stated")
+        
+        # Change image capture resoltion
+        # max image size for pictures
+        camera.resolution = (2592, 1944)  # keep 3:4 ratio
+    
+        # change frame rate (15 is max for this resoltion)
+        camera.framerate = 15
+        # rotate camera 180 degrees
+        camera.rotation = 180
+        directory = getcwd()
+        now = datetime.now()
+
+        # dd/mm/YY H:M:S
+        time = now.strftime("%d-%m-%Y-%H-%M-%S")
+        filename = directory+'/src/assets/images/' +time +'.jpg'
+        print(filename)
+        camera.capture(filename)
+        camera.stop_preview()
+        print("Preview Ended")
 
 
 def irDist():
     mySensor = qwiic_vl53l1x.QwiicVL53L1X()
-
-#	if mySensor.isConnected() == False:
-#		print("The Laser is not connected.")
-#		return
 
     mySensor.sensor_init()
     mySensor.start_ranging()
@@ -164,8 +163,10 @@ def getHeart():
     p = Pulsesensor()
     p.startAsyncBPM()
     bpm = p.BPM
-    return bpm
     p.stopAsyncBPM
+    return bpm
+    
+
 
 def irConverter(mm):
     cm = mm/10
@@ -211,4 +212,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    runFile()
+    digitalWrite(vibrator, 0)
+
+   
