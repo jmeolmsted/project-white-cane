@@ -1,21 +1,20 @@
-global STOP
-import signal
-import socket
-import time
-import webbrowser
-from json import dumps
-from multiprocessing import *
-from os import getcwd, getpid, kill, listdir, system
-from os.path import isfile, join
-
-from flask import Flask, current_app, request, url_for
-
-from flask_cors import CORS, cross_origin
-from flask_jsonpify import jsonify
-from flask_restful import Api, Resource
+from picamera import PiCamera
 from grovepi import *
-
-# from picamera import PiCamera
+from flask_restful import Api, Resource
+from flask_jsonpify import jsonify
+from flask_cors import CORS, cross_origin
+from flask import Flask, current_app, request, url_for
+from os.path import isfile, join
+from os import getcwd, getpid, kill, listdir, system
+from multiprocessing import *
+from json import dumps
+from pulsesensor import Pulsesensor
+import webbrowser
+import time
+import socket
+import signal
+import qwiic_vl53l1x
+global STOP
 
 
 try:
@@ -24,7 +23,7 @@ except:
     import json
 
 
-# camera = PiCamera()
+camera = PiCamera()
 
 # Pin Numbers
 vibrator = 3
@@ -50,7 +49,7 @@ pinMode(touch, "INPUT")
 
 ip = ''
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.connect(("8.8.8.8",80))
+s.connect(("8.8.8.8", 80))
 ip = s.getsockname()[0]
 s.close()
 
@@ -69,23 +68,29 @@ s.close()
 
 data = {'entries':  []}
 
+
 def makeEntry(k, v):
     return {'id': k, 'name': v}
 
-def makeData(usrfb,usrft,usrl,usrr,ir,touch,heart):
-    value = {'entry':[{'USRFB': usrfb}, {'USRFT': usrft}, {'USRL': usrl}, {'USRR': usrr}, {'IR': ir}, {'touch': touch}, {'heart': heart}]}
+
+def makeData(usrfb, usrft, usrl, usrr, ir, touch, heart):
+    value = {'entry': [{'USRFB': usrfb}, {'USRFT': usrft}, {'USRL': usrl}, {
+        'USRR': usrr}, {'IR': ir}, {'touch': touch}, {'heart': heart}]}
     return value
 
+
 def getData():
-    valUSRFB = round(converter(ultrasonicRead(usfb)),1)
-    valUSRFT = round(converter(ultrasonicRead(usft)),1)
-    valUSRL = round(converter(ultrasonicRead(usl)),1)
-    valUSRR = round(converter(ultrasonicRead(usr)),1)
-    valIR = 1
+    valUSRFB = round(converter(ultrasonicRead(usfb)), 1)
+    valUSRFT = round(converter(ultrasonicRead(usft)), 1)
+    valUSRL = round(converter(ultrasonicRead(usl)), 1)
+    valUSRR = round(converter(ultrasonicRead(usr)), 1)
+    valIR = round(irConverter(irDist()), 1)
     valTouch = True if digitalRead(touch) == 1 else False
-    valHeart = 60
-    data["entries"] = makeData(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR,valTouch,valHeart)
+    valHeart = getHeart()
+    data["entries"] = makeData(
+        valUSRFB, valUSRFT, valUSRL, valUSRR, valIR, valTouch, valHeart)
     return data
+
 
 def getImages():
     directory = getcwd()
@@ -103,6 +108,7 @@ def getImages():
         count += 1
     return out
 
+
 app = Flask(__name__)
 api = Api(app)
 
@@ -118,29 +124,69 @@ class Files(Resource):
     def get(self):
         return getImages()
 
+
 class Data(Resource):
     def get(self):
         return getData()
 
+
 api.add_resource(Files, '/files')  # Route_1
 api.add_resource(Data, '/data')
+
+
+
+
+def irDist():
+    mySensor = qwiic_vl53l1x.QwiicVL53L1X()
+
+#	if mySensor.isConnected() == False:
+#		print("The Laser is not connected.")
+#		return
+
+    mySensor.sensor_init()
+    mySensor.start_ranging()
+    time.sleep(0.005)
+    distance = mySensor.get_distance()
+    time.sleep(00.005)
+    mySensor.stop_ranging()
+
+    # print("Distance (mm): %s " % distance)
+    return distance
+
+
+def getHeart():
+    p = Pulsesensor()
+    p.startAsyncBPM()
+    bpm = p.BPM
+    return bpm
+    p.stopAsyncBPM
+
+def irConverter(mm):
+    cm = mm/10
+    return (converter(cm))
+
 
 def converter(cm):
     feet = (cm * 0.393701)/12
     return feet
 
+
 def runIp():
     ipApp.run(port=5002)
+
 
 def runFile():
     app.run(host=ip)
 
+
 def runIonic():
     system('ionic serve --external --no-open')
-    
+
+
 def openWeb():
     url = 'http://' + ip + ':8100'
     webbrowser.open(url)
+
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -150,11 +196,12 @@ def main():
         fileSite = pool.apply_async(runFile)
         #ionic = pool.apply_async(runIonic)
         #browser = pool.apply_async(openWeb)
-        
+
         pool.close()
         pool.join()
     except:
         pool.terminate()
+
 
 if __name__ == '__main__':
     #  main()
