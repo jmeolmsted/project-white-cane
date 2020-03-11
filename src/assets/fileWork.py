@@ -60,7 +60,7 @@ def getData():
     valTouch = True if digitalRead(touch) == 1 else False
     valHeart = 60
     if(valTouch):
-        if(valUSRFB <= 3 or valUSRFT <= 3 or valUSRL <= 3 or valUSRR <= 3 or valIR > 1):
+        if(valUSRFB <= 2 or valUSRFT <= 4 or valUSRL <= 1.5 or valUSRR <= 1.5 or valIR > 2):
             digitalWrite(vibrator,1)
         else:
             digitalWrite(vibrator, 0)
@@ -120,7 +120,7 @@ api.add_resource(Data, '/data')
 
 
 def takeImage(fb, ft, ir):
-    if(fb <= 3 or ft <= 3 or ir > 1):
+    if(fb <= 2 or ft <= 4 or ir > 2):
         camera = PiCamera()
 
         camera.start_preview()
