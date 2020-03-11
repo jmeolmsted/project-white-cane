@@ -23,7 +23,7 @@ export class SensorsPage {
   };
 
   value: any;
-  url = '10.16.26.188/data';
+  url = 'http://10.16.26.188:5000/data';
   server: Observable<any>;
 
 
@@ -61,5 +61,12 @@ export class SensorsPage {
     this.data.usrr = this.value.usrr;
     this.data.touch = this.value.touch;
     this.data.heart = this.value.heart;
+    if (this.value.usrfb <= 3 || this.value.usrft <= 3 || this.data.usrl <= 3 || this.data.usrr <= 3 || this.value.ir > 1) {
+      this.data.buzzText = 'On';
+      this.data.buzzer = true;
+    } else {
+      this.data.buzzText = 'Off';
+      this.data.buzzer = false;
+    }
   }
 }

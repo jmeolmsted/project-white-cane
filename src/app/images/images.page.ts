@@ -37,8 +37,8 @@ export class ImagesPage {
   showImage = false;
   ipAddress: string;
   endpoint: string;
-  fileURL = '10.16.26.188/files';
-  dataURL = '10.16.26.188/data';
+  fileURL = 'http://10.16.26.188:5000/files';
+  dataURL = 'http://10.16.26.188:5000/data';
   results = {};
   check: any;
 
