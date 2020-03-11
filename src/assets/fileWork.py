@@ -59,14 +59,13 @@ def getData():
     valIR = round(irConverter(irDist()), 1)
     valTouch = True if digitalRead(touch) == 1 else False
     valHeart = 60
-    if(valUSRFB <= 3 or valUSRFT <= 3 or valUSRL <= 3 or valUSRR <= 3 or valIR > 1):
-        digitalWrite(vibrator,1)
-        print("On")
-    else:
-        digitalWrite(vibrator, 0)
-        print("off")
-    data["entries"] = makeData(
-        valUSRFB, valUSRFT, valUSRL, valUSRR, valIR, valTouch, valHeart)
+    if(valTouch):
+        if(valUSRFB <= 3 or valUSRFT <= 3 or valUSRL <= 3 or valUSRR <= 3 or valIR > 1):
+            digitalWrite(vibrator,1)
+        else:
+            digitalWrite(vibrator, 0)
+        data["entries"] = makeData(
+            valUSRFB, valUSRFT, valUSRL, valUSRR, valIR, valTouch, valHeart)
     return data
     
     
@@ -74,10 +73,10 @@ def getData():
 
 def getImages():
     directory = getcwd()
-    valUSRFB = round(converter(ultrasonicRead(usfb)), 1)
-    valUSRFT = round(converter(ultrasonicRead(usft)), 1)
-    valIR = round(irConverter(irDist()), 1)
-    takeImage(valUSRFB, valUSRFT, valIR)
+    # valUSRFB = round(converter(ultrasonicRead(usfb)), 1)
+    # valUSRFT = round(converter(ultrasonicRead(usft)), 1)
+    # valIR = round(irConverter(irDist()), 1)
+    # takeImage(valUSRFB, valUSRFT, valIR)
 
     onlyfiles = [f for f in listdir(directory+'/src/assets/images') if isfile(
         join(directory+'/src/assets/images', f))]
@@ -132,7 +131,7 @@ def takeImage(fb, ft, ir):
         # change frame rate (15 is max for this resoltion)
         camera.framerate = 15
         # rotate camera 180 degrees
-        camera.rotation = 180
+        # camera.rotation = 180
         directory = getcwd()
         now = datetime.now()
 
