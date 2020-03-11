@@ -87,10 +87,16 @@ def getData():
     valIR = round(irConverter(irDist()), 1)
     valTouch = True if digitalRead(touch) == 1 else False
     valHeart = getHeart()
+    vibrationStatus(valUSRFB,valUSRFT,valUSRL,valUSRR,valIR)
     data["entries"] = makeData(
         valUSRFB, valUSRFT, valUSRL, valUSRR, valIR, valTouch, valHeart)
     return data
 
+def vibrationStatus(fb,ft,l,r,ir) :
+    if( fb <= 3 or ft <= 3 or l <= 3 or r <= 3 or ir > 1):
+        digitalWrite(vibrator,1)
+    else:
+        digitalWrite(vibrator, 0)
 
 def getImages():
     directory = getcwd()
@@ -200,9 +206,9 @@ def main():
         pool.close()
         pool.join()
     except:
+        digitalWrite(vibrator, 0)
         pool.terminate()
 
 
 if __name__ == '__main__':
-    #  main()
-    runFile()
+    main()
