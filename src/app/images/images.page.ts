@@ -55,6 +55,7 @@ export class ImagesPage {
       this.fileData = files as JSON;
     });
     this.server = this.http.get(this.fileURL);
+    console.log(this.server)
 
     setInterval(() => {
       this.getStatus(); // Now the "this" still references the component

@@ -13,13 +13,15 @@ export class SensorsPage {
   data = { usrf: 200,
     usrl: 200,
     usrr: 200,
+    ir: 1,
     touch: true,
     heart: 60,
     buzzer: false,
     buzzText : 'Off',
     frontWarn: false,
     rightWarn: false,
-    leftWarn: false
+    leftWarn: false,
+    irWarn: false
   };
 
   value: any;
@@ -57,9 +59,30 @@ export class SensorsPage {
 
   updateData() {
     this.data.usrf = (this.value.usrfb + this.value.usrft) / 2;
+    if (this.value.usrfb <= 3 || this.value.usrft <= 3 ) {
+      this.data.frontWarn = true;
+    } else {
+      this.data.frontWarn = false;
+    }
     this.data.usrl = this.value.usrl;
+    if (this.data.usrl <= 3) {
+      this.data.leftWarn = true;
+    } else {
+      this.data.leftWarn = false;
+    }
     this.data.usrr = this.value.usrr;
+    if (this.data.usrr <= 3) {
+      this.data.rightWarn = true;
+    } else {
+      this.data.rightWarn = false;
+    }
     this.data.touch = this.value.touch;
+    this.data.ir = this.value.ir;
+    if (this.data.ir > 1) {
+      this.data.irWarn = true;
+    } else {
+      this.data.irWarn = false;
+    }
     this.data.heart = this.value.heart;
     if (this.value.usrfb <= 3 || this.value.usrft <= 3 || this.data.usrl <= 3 || this.data.usrr <= 3 || this.value.ir > 1) {
       this.data.buzzText = 'On';
