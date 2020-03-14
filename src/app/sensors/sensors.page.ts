@@ -45,7 +45,7 @@ export class SensorsPage {
     setInterval(() => {
       this.getData(); // Now the "this" still references the component
       this.updateData();
-    }, 250);
+    }, 500);
   }
 
   getData() {

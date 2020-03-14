@@ -34,11 +34,15 @@ usl = 7
 pinMode(vibrator, "OUTPUT")
 pinMode(touch, "INPUT")
 
+# IP address
+
 ip = ''
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.connect(("8.8.8.8", 80))
 ip = s.getsockname()[0]
 s.close()
+
+# Data Formatting
 
 def makeEntry(k, v):
     return {'id': k, 'name': v}
@@ -49,6 +53,7 @@ def makeData(usrfb, usrft, usrl, usrr, ir, touch, heart):
         'USRR': usrr}, {'IR': ir}, {'touch': touch}, {'heart': heart}]}
     return value
 
+# Data Collection
 
 def getData():
     data = {'entries':  []}
@@ -93,6 +98,7 @@ def getImages():
         count += 1
     return out
 
+# Flask server
 
 app = Flask(__name__)
 api = Api(app)
@@ -118,6 +124,8 @@ class Data(Resource):
 api.add_resource(Files, '/files')  # Route_1
 api.add_resource(Data, '/data')
 
+
+# Data Processing
 
 def takeImage(fb, ft, ir):
     if(fb <= 2 or ft <= 4 or ir > 2):
@@ -168,7 +176,6 @@ def getHeart():
     return bpm
     
 
-
 def irConverter(mm):
     cm = mm/10
     return (converter(cm))
@@ -179,9 +186,7 @@ def converter(cm):
     return feet
 
 
-def runIp():
-    ipApp.run(port=5002)
-
+# Processes for multiprocessesing
 
 def runFile():
     app.run(host=ip)
@@ -198,9 +203,8 @@ def openWeb():
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
-    pool = Pool(processes=2)
+    pool = Pool(processes=1)
     try:
-        ipSite = pool.apply_async(runIp)
         fileSite = pool.apply_async(runFile)
         #ionic = pool.apply_async(runIonic)
         #browser = pool.apply_async(openWeb)
@@ -212,6 +216,7 @@ def main():
         pool.terminate()
 
 
+# Running the app
 if __name__ == '__main__':
     runFile()
     digitalWrite(vibrator, 0)

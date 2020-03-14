@@ -1,6 +1,4 @@
 import { SensorsService } from './../services/sensors.service';
-import { IpAddressService } from './../services/ip-address.service';
-import { IpService } from './../services/ip.service';
 import { ImagesService } from './../services/images.service';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
@@ -42,8 +40,7 @@ export class ImagesPage {
   results = {};
   check: any;
 
-  constructor(private http: HttpClient, private imageService: ImagesService, private ipService: IpService, private ip: IpAddressService,
-              private sensor: SensorsService) {
+  constructor(private http: HttpClient, private imageService: ImagesService, private sensor: SensorsService) {
   }
 
   // tslint:disable-next-line: use-lifecycle-interface
@@ -59,14 +56,8 @@ export class ImagesPage {
 
     setInterval(() => {
       this.getStatus(); // Now the "this" still references the component
-    }, 250);
+    }, 500);
 
-  }
-
-  getIP() {
-    this.ip.getIPAddress().subscribe((res: any) => {
-      this.ipAddress = res.ip;
-    });
   }
 
   getStatus() {
